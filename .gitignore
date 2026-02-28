@@ -1,0 +1,41 @@
+.env
+.venv/
+__pycache__/
+*.pyc
+.DS_Store
+chroma_data/
+data/textbooks/*.pdf
+*.log
+.ipynb_checkpoints/
+cat > .gitignore << EOF
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+.env
+
+# Poetry
+.poetry/
+poetry.lock
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Data (не коммитьте PDF и индексы!)
+data/raw/*.pdf
+data/indexes/*.bin
+data/indexes/*.pkl
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+EOF
