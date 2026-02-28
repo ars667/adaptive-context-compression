@@ -7,7 +7,6 @@ chroma_data/
 data/textbooks/*.pdf
 *.log
 .ipynb_checkpoints/
-cat > .gitignore << EOF
 # Python
 __pycache__/
 *.py[cod]
@@ -38,4 +37,3 @@ Thumbs.db
 
 # Logs
 *.log
-EOF

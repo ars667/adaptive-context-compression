@@ -1,3 +1,9 @@
+import os
+# Fix PyTorch/FAISS/Tokenizers segfault on MacOS by restricting threading
+os.environ["OMP_NUM_THREADS"] = "1"
+os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
+os.environ["TOKENIZERS_PARALLELISM"] = "false"
+
 from pydantic_settings import BaseSettings as PydanticBaseSettings
 from typing import Optional
 
