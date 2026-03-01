@@ -20,10 +20,13 @@ class VectorStore:
         """Add documents to the vector store and create FAISS index."""
         self.chunks = chunks
 
-        # Extract texts and create embeddings
-        texts = [chunk["text"] for chunk in chunks]
+        # Extract texts and create embeddings with 'passage: ' prefix for E5
+        texts = [f"passage: {chunk['text']}" for chunk in chunks]
         embeddings = self.model.encode(texts, convert_to_numpy=True)
         embeddings = np.array(embeddings, dtype=np.float32)
+
+        # 🔧 Normalize for Cosine Similarity
+        faiss.normalize_L2(embeddings)
 
         # 🔧 Fix for empty or 1D arrays
         if len(embeddings) == 0:
@@ -94,8 +97,8 @@ class VectorStore:
         if self.index is None:
             raise ValueError("Index not created. Call add_documents() first.")
 
-        # Create query embedding
-        query_embedding = self.model.encode([query], convert_to_numpy=True)
+        # Create query embedding with 'query: ' prefix for E5
+        query_embedding = self.model.encode([f"query: {query}"], convert_to_numpy=True)
 
         if query_embedding.ndim == 1:
             query_embedding = np.expand_dims(query_embedding, axis=0)

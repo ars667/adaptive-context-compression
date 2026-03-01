@@ -35,11 +35,16 @@ def main():
     # Split into chunks
     chunks = split_into_chunks(pages, settings.CHUNK_SIZE, settings.CHUNK_OVERLAP)
 
+    if not chunks:
+        print("❌ Ошибка: В документе не найдено текста для индексации.")
+        print("   Убедитесь, что PDF содержит текстовый слой (не является картинкой).")
+        return
+
     # Create vector store and add documents
     vector_store = VectorStore()
     vector_store.add_documents(chunks)
 
-    print(f"Проиндексировано {len(chunks)} чанков")
+    print(f"✅ Успешно проиндексировано {len(chunks)} чанков")
 
 
 if __name__ == "__main__":

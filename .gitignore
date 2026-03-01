@@ -1,12 +1,3 @@
-.env
-.venv/
-__pycache__/
-*.pyc
-.DS_Store
-chroma_data/
-data/textbooks/*.pdf
-*.log
-.ipynb_checkpoints/
 # Python
 __pycache__/
 *.py[cod]
@@ -14,6 +5,7 @@ __pycache__/
 *.so
 .Python
 venv/
+.venv/
 .env
 
 # Poetry
@@ -25,15 +17,15 @@ poetry.lock
 .idea/
 *.swp
 *.swo
-
-# Data (не коммитьте PDF и индексы!)
-data/raw/*.pdf
-data/indexes/*.bin
-data/indexes/*.pkl
-
-# OS
 .DS_Store
 Thumbs.db
 
+# Data (Large files and indexes)
+data/raw/*.pdf
+data/indexes/*.bin
+data/indexes/*.pkl
+data/textbooks/*.pdf
+
 # Logs
 *.log
+.ipynb_checkpoints/

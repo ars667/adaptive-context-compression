@@ -15,8 +15,15 @@ class RAGPipeline:
         settings = get_settings()
         self.top_k = int(settings.TOP_K_CHUNKS)
 
+        import os
         # Initialize components
-        self.vector_store = VectorStore()
+        index_path = "data/indexes/faiss_index.bin"
+        if os.path.exists(index_path):
+            self.vector_store = VectorStore.load(index_path)
+            self.current_document = "loaded_from_disk"
+        else:
+            self.vector_store = VectorStore(index_path)
+            
         self.compressor = ContextCompressor()
         self.llm = GroqClient()
 
@@ -32,11 +39,17 @@ class RAGPipeline:
         Returns:
             Number of chunks indexed
         """
+        from src.document_processing.loader import split_into_chunks
+        settings = get_settings()
+        
         # Load document (support PDF for now)
         if file_path.endswith(".pdf"):
-            chunks = load_pdf(file_path)
+            pages = load_pdf(file_path)
         else:
             raise ValueError(f"Unsupported file format: {file_path}")
+
+        # Split into chunks
+        chunks = split_into_chunks(pages, int(settings.CHUNK_SIZE), int(settings.CHUNK_OVERLAP))
 
         # Add to vector store (this also saves the index)
         self.vector_store.add_documents(chunks)

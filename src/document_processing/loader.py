@@ -1,3 +1,4 @@
+import os
 import re
 import fitz  # PyMuPDF
 from docx import Document
@@ -8,10 +9,46 @@ def load_pdf(path: str) -> List[str]:
     """Load PDF file and extract text pages."""
     doc = fitz.open(path)
     pages = []
+    total_text_len = 0
+    
+    # Try getting text normally first
     for page_num in range(len(doc)):
         page = doc.load_page(page_num)
         text = page.get_text()
         pages.append(text)
+        total_text_len += len(text.strip())
+
+    # If no text found, it's a scanned PDF. Use OCR fallback on MacOS.
+    if total_text_len == 0:
+        print(f"\n⚠️  Файл '{os.path.basename(path)}' кажется отсканированным. Запускаю OCR (Apple Vision)...")
+        try:
+            from ocrmac import ocrmac
+            pages = [] # Reset pages to fill with OCR
+            for page_num in range(len(doc)):
+                page = doc.load_page(page_num)
+                # Convert page to image for OCR
+                pix = page.get_pixmap()
+                temp_img = f"/tmp/ocr_page_{page_num}.png"
+                pix.save(temp_img)
+                
+                # Run OCR
+                annotations = ocrmac.OCR(temp_img).recognize()
+                page_text = " ".join([a[0] for a in annotations])
+                pages.append(page_text)
+                
+                # Cleanup
+                if os.path.exists(temp_img):
+                    os.remove(temp_img)
+                    
+                if (page_num + 1) % 10 == 0:
+                    print(f"   Обработано {page_num + 1}/{len(doc)} страниц...")
+            
+            print(f"✅ OCR завершен. Извлечено {sum(len(p) for p in pages)} символов.")
+        except ImportError:
+            print("❌ Ошибка: Библиотека 'ocrmac' не установлена. OCR невозможен.")
+        except Exception as e:
+            print(f"❌ Ошибка при выполнении OCR: {e}")
+            
     doc.close()
     return pages
 
